@@ -1,0 +1,3 @@
+curl -s -H "Content-Type: application/json" -X DELETE -d '{"name":"Product two", "description": "This is product two updated", "price": 250.00, "qty": 20 }' http://127.0.0.1:5000/product/2
+curl -s -H "Content-Type: application/json" -X POST -d '{"name":"Product two", "description": "This is product two updated", "price": 250.00, "qty": 20 }' http://127.0.0.1:5000/product/3
+curl -s -H "Content-Type: application/json" -X PUT -d '{"name":"Product two", "description": "This is product two updated", "price": 250.00, "qty": 20 }' http://127.0.0.1:5000/product/3
