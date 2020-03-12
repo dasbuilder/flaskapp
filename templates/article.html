@@ -1,8 +1,10 @@
 {% extends 'layout.html' %}
 
-{% block body %} 
-    <h1>{{id}}</h1>
-    {% for article in articles %}
-        <li class="list-group-item"><a href="article/{{article.id}}">{{article.title}}</a></li>
-    {% endfor %}
+{% block body %}
+  <h2>{{article.title}}</h2>
+  <small>Written by {{article.author}} on {{article.create_date}}</small>
+  <hr>
+  <div>
+    {{article.body | safe}}
+  </div>
 {% endblock %}

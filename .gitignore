@@ -1,3 +1,4 @@
 .vscode/*
+*.sql
 __pycache__/*
 flaskapi/*
