@@ -1,3 +1,4 @@
+pyvenv.cfg
 .vscode/*
 *.sql
 __pycache__/*
