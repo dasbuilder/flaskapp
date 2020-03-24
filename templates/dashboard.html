@@ -3,30 +3,27 @@
 {% block body %}
   <h1>Dashboard</h1> 
   <h3><small> Welcome {{session.username}}</small></h3>
-  <a class="btn btn-success" href="/add_article"> Add Article</a>
+  <a class="btn btn-success" href="/add_care_center"> Add Care Center</a>
   <hr>
   <table class="table table-striped">
     <tr>
       <th>ID</th>
-      <th>Title</th>
-      <th>Author</th>
-      <th>Date</th>
+      <th>Name</th>
+      <th>Address</th>
+      <th>Phone</th>
+      <th>Date Entered</th>
       <th></th>
       <th></th>
     </tr>
-    {% for article in articles %}
+    {% for info in care_center %}
       <tr>
-        <td>{{article.id}}</td>
-        <td>{{article.title}}</td>
-        <td>{{article.author}}</td>
-        <td>{{article.create_date}}</td>
-        <td><a href="edit_article/{{article.id}}" class="btn btn-default pull-right">Edit</a></td>
-        <td>
-          <form action="{{url_for('delete_article', id=article.id)}}" method="post">
-            <input type="hidden" name="_method" value="DELETE">
-            <input type="submit" value="Delete" class="btn btn-danger">
-          </form>
-        </td>
+        <td>{{info.id}}</td>
+        <td>{{info.name}}</td>
+        <td>{{info.address}}</td>
+        <td>{{info.phone}}</td>
+        <td>{{info.create_date}}</td>
+        <td><a href="edit_care_center/{{info.id}}" class="btn btn-default pull-right">Edit</a></td>
+        <td></td>
           </form>
         </td>
       </tr>

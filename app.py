@@ -23,8 +23,6 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 mysql = MySQL(app)
 
 
-# Articles = Articles()
-
 # Index
 @app.route('/')
 def index():
@@ -34,39 +32,6 @@ def index():
 @app.route('/about')
 def about():
     return render_template('about.html')
-
-# Articles
-@app.route('/articles')
-def articles():
-    # Create cursor
-    cur = mysql.connection.cursor()
-
-    # Get articles
-    result = cur.execute("SELECT * FROM articles")
-
-    articles = cur.fetchall()
-
-    if result > 0:
-        return render_template('articles.html', articles=articles)
-    else:
-        msg = 'No Articles Found'
-        return render_template('articles.html', msg=msg)
-    # Close connection
-    cur.close()
-
-
-#Single Article
-@app.route('/article/<string:id>/')
-def article(id):
-    # Create cursor
-    cur = mysql.connection.cursor()
-
-    # Get article
-    result = cur.execute("SELECT * FROM articles WHERE id = %s", [id])
-
-    article = cur.fetchone()
-
-    return render_template('article.html', article=article)
 
 
 # User Registration form class
@@ -79,6 +44,7 @@ class RegisterForm(Form):
         validators.EqualTo('confirm', message='Passwords do not match')
     ])
     confirm = PasswordField('Confirm Password')
+
 
 # User registration
 @app.route('/register', methods=['GET','POST'])
@@ -106,6 +72,7 @@ def register():
 
         return render_template('register.html', form=form)
     return render_template('register.html', form=form)
+
 
 # User login
 @app.route('/login', methods=['GET','POST'])
@@ -172,14 +139,14 @@ def dashboard():
     # Create cursor
     cur = mysql.connection.cursor()
 
-    # Get articles
-    # Show articles only from the user logged in 
-    result = cur.execute("SELECT * FROM articles")
+    # Get care centers
+    # Show care centers only from the user logged in
+    result = cur.execute("SELECT * FROM in_network WHERE author = %s", [session['username']])
 
-    articles = cur.fetchall()
+    care_centers = cur.fetchall()
 
     if result > 0:
-        return render_template('dashboard.html', articles=articles)
+        return render_template('dashboard.html', centers=care_centers)
     else:
         msg = 'No Articles Found'
         return render_template('dashboard.html', msg=msg)
@@ -187,76 +154,111 @@ def dashboard():
     cur.close()
 
 
+'''
+################################################################
+                Begin Care Center addition
+################################################################
+'''
 
-# Article Form Class
-class ArticleForm(Form):
-    title = StringField('Title', [validators.Length(min=1, max=200)])
-    body = TextAreaField('Body', [validators.Length(min=30)])
-
-
-# Add Article
-@app.route('/add_article', methods=['GET', 'POST'])
+# Care Centers
+@app.route('/care_centers')
 @is_logged_in
-def add_article():
-    form = ArticleForm(request.form)
-    
-    # Checking for the post request
-    if request.method == 'POST' and form.validate():
-        
-        # Setting title and body from the submitted form
-        title = form.title.data
-        body = form.body.data
+def care_centers():
+    # Create cursor
+    cur = mysql.connection.cursor()
 
-        # Create cursor
+    # Get care centers
+    result = cur.execute("SELECT * FROM in_network")
+
+    care_centers = cur.fetchall()
+
+    if result > 0:
+        return render_template('care_centers.html', care_centers=care_centers)
+    else:
+        msg = 'No Care Centers Found'
+        return render_template('care_centers.html', msg=msg)
+    # Close connection
+    cur.close()
+
+#Single Care Center
+@app.route('/care_center/<string:id>/')
+def article(id):
+    # Create cursor
+    cur = mysql.connection.cursor()
+
+    # Get article
+    cur.execute("SELECT * FROM in_network WHERE id = %s", [id])
+
+    care_center = cur.fetchone()
+
+    return render_template('care_center.html', care_center=care_center)
+
+
+# Care center class
+class CareCenterForm(Form):
+    center_name = StringField('name', [validators.Length(min=1, max=100)])
+    center_address = StringField('address', [validators.Length(min=10)])
+    center_phone = StringField('phone', [validators.Length(min=6)])
+
+# Add urgent care center/hospital
+@app.route('/add_care_center', methods=['GET', 'POST'])
+@is_logged_in
+def add_hospital():
+    form = CareCenterForm(request.form)
+
+    if request.method == 'POST' and form.validate():
+        center_name = form.center_name.data
+        center_address = form.center_address.data
+        center_phone = form.center_phone.data
+
         cur = mysql.connection.cursor()
         
-        # Execute query
-        cur.execute('INSERT INTO articles(title, body, author) VALUES(%s, %s, %s)', (title, body, session['username']))
+        cur.execute('INSERT INTO in_network(name, address, phone, author) VALUES(%s, %s, %s, %s)', (center_name, center_address, center_phone, session['username']))
 
-        # Save changes to DB
         mysql.connection.commit()
 
-        # Close connection
         cur.close()
 
         # Show an on-screen message and redirect to dashboard. 
-        flash('Article Created', 'success')
+        flash('Care center added', 'success')
 
         return redirect(url_for('dashboard'))
 
-    return render_template('add_article.html', form=form)
+    return render_template('add_care_center.html', form=form)
 
 
-# Edit Article
-@app.route('/edit_article/<string:id>', methods=['GET', 'POST'])
+# Edit Care center
+@app.route('/edit_care_center/<string:id>', methods=['GET', 'POST'])
 @is_logged_in
-def edit_article(id):
+def edit_care_center(id):
     # Create cursor
     cur = mysql.connection.cursor()
 
     # Get article by id
-    cur.execute("SELECT * FROM articles WHERE id = %s", [id])
+    cur.execute("SELECT * FROM in_network WHERE id = %s", [id])
 
-    article = cur.fetchone()
+    care_centers = cur.fetchone()
     cur.close()
 
     # Get form
-    form = ArticleForm(request.form)
+    form = CareCenterForm(request.form)
 
     # Populate article form fields
-    form.title.data = article['title']
-    form.body.data = article['body']
+    form.center_name.data = care_centers['name']
+    form.center_address.data = care_centers['address']
+    form.center_phone.data = care_centers['phone']
 
     if request.method == 'POST' and form.validate():
-        title = request.form['title']
-        body = request.form['body']
+        center_name = request.form['center_name']
+        center_address = request.form['center_address']
+        center_phone = request.form['center_phone']
 
         # Create Cursor
         cur = mysql.connection.cursor()
-        app.logger.info(title)
+        app.logger.info(center_name)
 
         # Execute
-        cur.execute ("UPDATE articles SET title=%s, body=%s WHERE id=%s",(title, body, id))
+        cur.execute ("UPDATE in_network SET name=%s, address=%s, phone=%s WHERE id=%s", (center_name, center_address, center_phone))
 
         # Commit to DB
         mysql.connection.commit()
@@ -264,11 +266,51 @@ def edit_article(id):
         #Close connection
         cur.close()
 
-        flash('Article Updated', 'success')
+        flash('Care center updated', 'success')
 
         return redirect(url_for('dashboard'))
 
-    return render_template('edit_article.html', form=form)
+    return render_template('edit_care_center.html', form=form)
+
+
+'''
+##########################################################
+                    Begin Articles
+##########################################################
+'''
+
+# Articles
+@app.route('/articles')
+def articles():
+    # Create cursor
+    cur = mysql.connection.cursor()
+
+    # Get articles
+    result = cur.execute("SELECT * FROM articles")
+
+    articles = cur.fetchall()
+
+    if result > 0:
+        return render_template('articles.html', articles=articles)
+    else:
+        msg = 'No Articles Found'
+        return render_template('articles.html', msg=msg)
+    # Close connection
+    cur.close()
+
+
+#Single Article
+@app.route('/article/<string:id>/')
+def article(id):
+    # Create cursor
+    cur = mysql.connection.cursor()
+
+    # Get article
+    cur.execute("SELECT * FROM articles WHERE id = %s", [id])
+
+    article = cur.fetchone()
+
+    return render_template('article.html', article=article)
 
 # Delete Article
 @app.route('/delete_article/<string:id>', methods=['POST'])
