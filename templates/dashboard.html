@@ -15,14 +15,14 @@
       <th></th>
       <th></th>
     </tr>
-    {% for info in care_center %}
+    {% for info in care_centers %}
       <tr>
-        <td>{{info.id}}</td>
+        <td>{{info.ID}}</td>
         <td>{{info.name}}</td>
         <td>{{info.address}}</td>
         <td>{{info.phone}}</td>
         <td>{{info.create_date}}</td>
-        <td><a href="edit_care_center/{{info.id}}" class="btn btn-default pull-right">Edit</a></td>
+        <td><a href="edit_care_center/{{info.ID}}" class="btn btn-default pull-right">Edit</a></td>
         <td></td>
           </form>
         </td>

@@ -1,13 +1,37 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-  <h2>{{care_center.title}}</h2>
-  <small>Written by {{care_center.author}} on {{care_center.create_date}}</small>
+  <h2>{{care_centers.name}}</h2>
+  <small>Added by {{care_centers.author}} on {{care_centers.create_date}}</small>
   <hr>
-  <div>
-    {{care_center.name | safe}}
-  </div>
-  <div>
-      {{care_center.phone | safe}}
-  </div>
+    <table>
+      <tr>
+        <td>
+          <b>Care Center Name</b>
+        </td>
+        <td></td>
+        <td>
+          <b>Care Center Address</b>
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>
+          {{care_centers.name | safe}}
+        </td>
+        <td></td>
+        <td>
+          {{care_centers.address}}
+        </td>
+        <td></td>
+        <tr>
+            <td>
+              <b>Care Center Phone</b>
+            </td>
+        <td>
+          {{care_centers.phone | safe}}
+        </td>
+        </tr>
+    </tr>   
+    </table>
 {% endblock %}

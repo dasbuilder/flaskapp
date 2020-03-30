@@ -3,6 +3,6 @@
 {% block body %} 
     <h1>Care Centers</h1>
     {% for center in care_centers %}
-        <li class="list-group-item"><a href="care_center/{{center.id}}">Hi</a></li>
+        <li class="list-group-item"><a href="care_center/{{center.ID}}">{{center.name}}</a></li>
     {% endfor %}
 {% endblock %}
